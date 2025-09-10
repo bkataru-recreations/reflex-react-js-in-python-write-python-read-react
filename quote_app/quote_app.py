@@ -2,6 +2,7 @@
 import requests
 # we give reflex an alias of rx
 import reflex as rx
+from rxconfig import config
 # in order to get some random quotes
 import random
 
@@ -16,11 +17,13 @@ class QuoteState(rx.State):
         response = requests.get("https://api.quotable.kurokeita.dev/api/quotes")
         data = response.json()["data"]
         random_number: int = random.randint(0, 10)
-        self.quote = data[random_number]['text']
-        self.author = data[random_number]['author']
+        elem = data[random_number]
+        
+        self.quote = elem['content']
+        self.author = elem['author']['name']
 
-def home():
-    return rx.center(
+def index() -> rx.Component:
+    return rx.container(
         rx.vstack(
             rx.heading("Random Quote Generator"),
             rx.button("Get Quote", on_click=QuoteState.get_quote),
@@ -35,5 +38,4 @@ def home():
     )
 
 app = rx.App()
-app.add_page(home, title="Random Quote Generator")
-app.compile()
+app.add_page(index, title="Random Quote Generator")
